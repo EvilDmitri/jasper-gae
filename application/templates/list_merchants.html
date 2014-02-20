@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block style_block %}
+    <style type="text/css">
+        table.table { width: 60%; }
+    </style>
+{% endblock %}
+
+{% block content %}
+
+    <h1 id="">All merchants</h1>
+    <div>&nbsp;</div>
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Added on</th>
+                <th>&nbsp;</th>
+                <th>&nbsp;</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for merchant in merchants %}
+            {% set merchant_id = merchant.key.id() %}
+            <tr>
+                <td>{{ merchant_id }}</td>
+                <td>{{ merchant.merchant_name }}</td>
+                <td>{{ merchant.merchant_cost }}</td>
+                <td class="nowrap">{{ merchant.timestamp.strftime('%b %d, %Y %I:%M %p') }}</td>
+                <td>
+                    <a href="{{ url_for('edit_merchant', merchant_id=merchant_id) }}" class="btn">Edit</a>
+                </td>
+                <td>
+                    <form method="post" action="{{ url_for('delete_merchant', merchant_id=merchant_id) }}">
+                        <button class="btn">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="7">No merchants yet</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <p>
+        <a class="btn btn-primary" data-toggle="modal" data-target="#new-merchant-modal">
+            <i class="icon-plus-sign icon-white"></i>
+            New merchant
+        </a>
+    </p>
+
+    {% include 'new_merchant.html' %} {# pull in new_merchant form (modal dialog) #}
+
+{% endblock content %}
+
+{% block tail_script %}
+    <script>
+        var FormHelpers = {
+            validate: function (form, evt) {
+                // Form validation for modal dialog
+                var merchant_name = form.find('#merchant_name').val();
+                var merchant_description = form.find('#merchant_cost').val();
+                if (!(merchant_name)) {
+                    evt.preventDefault();
+                    Utils.renderFieldErrorTooltip('#merchant_name', 'Name is required', 'right');
+                }
+                if (!(merchant_description)) {
+                    evt.preventDefault();
+                    Utils.renderFieldErrorTooltip('#merchant_Cost', 'Cost is required', 'right');
+                }
+            },
+            init: function () {
+                var self = this;
+                var merchant_form = $('#new-merchant-form');
+                merchant_form.on('submit', function (evt) {
+                    self.validate(merchant_form, evt)
+                });
+            }
+        };
+        $(document).ready(function() {
+            FormHelpers.init();
+        });
+    </script>
+{% endblock tail_script %}
