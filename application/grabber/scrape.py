@@ -6,7 +6,7 @@ from lxml import html
 from application.models import MerchantModel, ResultDataModel
 from lib.werkzeug.utils import redirect
 
-BASE_URL = 'https://ultimaterewardsearn.chase.com/shopping'
+BASE_URL = 'http://ultimaterewardsearn.chase.com/shopping'
 
 
 class UltimateRewardsGrabber:
@@ -20,11 +20,11 @@ class UltimateRewardsGrabber:
         page = str(website.content)
         tree = html.fromstring(page)
 
-        divs = tree.xpath('//div[contains(@class, "mn_srchListSection")]')
-
-        merchants = []
+        divs = tree.xpath('//div[class="mn_srchListSection"]')
+        merchants_data = []
         for div in divs:
             try:
+
                 merchants = div.text().split('/$')
                 for merchant in merchants:
                     merchant = merchant.split('Details ')[1]
@@ -41,9 +41,9 @@ class UltimateRewardsGrabber:
 
             merchant.put()
             merchant_id = merchant.key.id()
-            merchants.append(merchant_id)
+            merchants_data.append(merchant_id)
 
-        result = ResultDataModel(merchants=merchants)
+        result = ResultDataModel(merchants=''.join(merchants_data))
         result.put()
         result_id = result.key.id()
         return result_id

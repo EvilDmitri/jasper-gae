@@ -40,6 +40,7 @@ def list_results():
 
 def grab():
     # Grab data
+    print 'yo'
     grabber = UltimateRewardsGrabber()
     grabber.grab()
     flash(u'Successfully grabbed')
