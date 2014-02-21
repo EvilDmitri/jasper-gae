@@ -18,26 +18,29 @@ app.add_url_rule('/_ah/warmup', 'warmup', view_func=views.warmup)
 # Home page
 app.add_url_rule('/', 'home', view_func=views.home)
 
-# merchants list page
+# results list page
 app.add_url_rule('/results', 'list_results', view_func=views.list_results, methods=['GET'])
 
-# merchants list page
+# Show the merchant
+app.add_url_rule('/result/<int:result_id>', 'show_result', view_func=views.show_result, methods=['GET', 'POST'])
+
+# Delete a result
+app.add_url_rule('/results/<int:result_id>/delete', view_func=views.delete_result, methods=['POST'])
+
+# ajax grabber
 app.add_url_rule('/grab', 'grab', view_func=views.grab, methods=['GET'])
 
 # merchants list page
-app.add_url_rule('/merchants', 'list_merchants', view_func=views.list_merchants, methods=['GET', 'POST'])
+# app.add_url_rule('/merchants', 'list_merchants', view_func=views.list_merchants, methods=['GET', 'POST'])
 
 # merchants list page (cached)
-app.add_url_rule('/merchants/cached', 'cached_merchants', view_func=views.cached_merchants, methods=['GET'])
+# app.add_url_rule('/merchants/cached', 'cached_merchants', view_func=views.cached_merchants, methods=['GET'])
 
 # Contrived admin-only view merchant
 app.add_url_rule('/admin_only', 'admin_only', view_func=views.admin_only)
 
-# Edit an merchant
-app.add_url_rule('/merchants/<int:merchant_id>/edit', 'edit_merchant', view_func=views.edit_merchant, methods=['GET', 'POST'])
 
-# Delete an merchant
-app.add_url_rule('/merchants/<int:merchant_id>/delete', view_func=views.delete_merchant, methods=['POST'])
+
 
 
 ## Error handlers

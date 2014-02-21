@@ -8,7 +8,7 @@
 
 {% block content %}
 
-    <h1 id="">All results</h1>
+    <div class="h1" id="title">All results</div>
     <div>&nbsp;</div>
     <table class="table table-bordered table-striped">
         <thead>
@@ -24,7 +24,7 @@
 
                 <script>
                     function showMerchants(result_id) {
-                        window.location.href = '/result/'+result_id
+                        window.location.href = '/result/'+result_id;
                     }
                 </script>
             <tr onclick="showMerchants({{ result_id }});">

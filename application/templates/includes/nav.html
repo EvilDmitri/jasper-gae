@@ -15,8 +15,8 @@
                             <b class="caret"></b>
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a href="#" onclick="startGrabber();">Scrape One</a></li>
-                            <li><a href="#" >Scrape  Two</a></li>
+                            <li><a href="" onclick="event.preventDefault(); startGrabber();">Scrape 'ultimaterewardsearn.chase.com'</a></li>
+                            <li><a href="#" >Scrape more...</a></li>
                         </ul>
                     </li>
 
@@ -42,8 +42,9 @@ function startGrabber() {
           window.location.href = '/';
       }
     };
-    xmlhttp.open("GET","grab",true);
+    xmlhttp.open("GET","/grab",true);
     xmlhttp.send();
+
 }
 
 </script>

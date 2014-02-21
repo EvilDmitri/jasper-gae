@@ -38,21 +38,25 @@ def list_results():
     return render_template('list_data.html', results=results)
 
 
-def grab():
-    # Grab data
-    print 'yo'
-    grabber = UltimateRewardsGrabber()
-    grabber.grab()
-    flash(u'Successfully grabbed')
-    return 'OK'
+@login_required
+def show_result(result_id):
+    """List all scraped data"""
+    result = ResultDataModel.get_by_id(result_id)
+    merchants_id = result.merchants.split('/')
+    merchants = []
+    for merchant_id in merchants_id:
+        m = MerchantModel.get_by_id(int(merchant_id))
+        merchants.append(m)
+
+    return render_template('list_merchants.html', merchants=merchants)
 
 
 @login_required
-def delete_merchant(result_id):
+def delete_result(result_id):
     """Delete an results object"""
-    merchant = ResultDataModel.get_by_id(result_id)
+    result = ResultDataModel.get_by_id(result_id)
     try:
-        merchant.key.delete()
+        result.key.delete()
         flash(u'result %s successfully deleted.' % result_id, 'success')
         return redirect(url_for('list_results'))
     except CapabilityDisabledError:
@@ -64,50 +68,7 @@ def delete_merchant(result_id):
 def list_merchants():
     """List all merchants"""
     merchants = MerchantModel.query()
-    form = MerchantForm()
-    if form.validate_on_submit():
-        merchant = MerchantModel(
-            merchant_name=form.merchant_name.data,
-            merchant_cost=form.merchant_cost.data,
-            # added_by=users.get_current_user()
-        )
-        try:
-            merchant.put()
-            merchant_id = merchant.key.id()
-            flash(u'merchant %s successfully saved.' % merchant_id, 'success')
-            return redirect(url_for('list_merchants'))
-        except CapabilityDisabledError:
-            flash(u'App Engine Datastore is currently in read-only mode.', 'info')
-            return redirect(url_for('list_merchants'))
-
     return render_template('list_merchants.html', merchants=merchants, form=form)
-
-
-@login_required
-def edit_merchant(merchant_id):
-    merchant = MerchantModel.get_by_id(merchant_id)
-    form = MerchantForm(obj=merchant)
-    if request.method == "POST":
-        if form.validate_on_submit():
-            merchant.merchant_name = form.data.get('merchant_name')
-            merchant.merchant_cost = form.data.get('merchant_cost')
-            merchant.put()
-            flash(u'merchant %s successfully saved.' % merchant_id, 'success')
-            return redirect(url_for('list_merchants'))
-    return render_template('edit_merchant.html', merchant=merchant, form=form)
-
-
-@login_required
-def delete_merchant(merchant_id):
-    """Delete an merchant object"""
-    merchant = MerchantModel.get_by_id(merchant_id)
-    try:
-        merchant.key.delete()
-        flash(u'merchant %s successfully deleted.' % merchant_id, 'success')
-        return redirect(url_for('list_merchants'))
-    except CapabilityDisabledError:
-        flash(u'App Engine Datastore is currently in read-only mode.', 'info')
-        return redirect(url_for('list_merchants'))
 
 
 @admin_required
@@ -130,3 +91,10 @@ def warmup():
     """
     return ''
 
+
+def grab():
+    # Grab data
+    grabber = UltimateRewardsGrabber()
+    result_id = grabber.grab()
+    flash(u'Successfully grabbed')
+    return result_id
