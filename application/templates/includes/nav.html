@@ -15,8 +15,8 @@
                             <b class="caret"></b>
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a href="#">Scrape One</a></li>
-                            <li><a href="#">Scrape  Two</a></li>
+                            <li><a href="" onclick="startGrabber();">Scrape One</a></li>
+                            <li><a href="#" >Scrape  Two</a></li>
                         </ul>
                     </li>
 
@@ -25,3 +25,25 @@
         </div><!-- /.navbar .container -->
     </div><!-- /.navbar-inner -->
 </div><!-- /navbar -->
+
+<script>
+function startGrabber() {
+    document.getElementById('title').innerHTML = 'Scraping... Please wait...';
+    var xmlhttp;
+    if (window.XMLHttpRequest) {// code for IE7+, Firefox, Chrome, Opera, Safari
+        xmlhttp=new XMLHttpRequest();
+    }
+    else {// code for IE6, IE5
+        xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+    }
+
+    xmlhttp.onreadystatechange=function() {
+      if (xmlhttp.readyState==4 && xmlhttp.status==200) {
+          window.location.href = '/';
+      }
+    };
+    xmlhttp.open("GET","grab",true);
+    xmlhttp.send();
+}
+
+</script>

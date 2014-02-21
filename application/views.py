@@ -16,6 +16,7 @@ from flask import request, render_template, flash, url_for, redirect
 from flask_cache import Cache
 
 from application import app
+from application.grabber.scrape import UltimateRewardsGrabber
 from decorators import login_required, admin_required
 from forms import MerchantForm
 from models import MerchantModel, ResultDataModel
@@ -35,6 +36,14 @@ def list_results():
     results = ResultDataModel.query()
 
     return render_template('list_data.html', results=results)
+
+
+def grab():
+    # Grab data
+    grabber = UltimateRewardsGrabber()
+    grabber.grab()
+    flash(u'Successfully grabbed')
+    return 'OK'
 
 
 @login_required
