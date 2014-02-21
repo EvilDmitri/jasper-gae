@@ -6,7 +6,7 @@ from google.appengine.runtime.apiproxy_errors import CapabilityDisabledError
 from lxml import html
 import re
 
-from application.models import MerchantModel, ResultDataModel
+from application.models import MerchantModel, ResultDataModel, ResultModel
 from lib.werkzeug.utils import redirect
 
 BASE_URL = 'http://ultimaterewardsearn.chase.com/shopping'
@@ -53,15 +53,18 @@ class UltimateRewardsGrabber:
             title = title.replace(' Details', '')
             cost = merchants[merchant].text.rstrip().lstrip()
             cost = cost.split('p')[0].rstrip().lstrip()
-            merchant = MerchantModel(merchant_name=title,
-                                     merchant_cost=int(cost)
-                                     )
-            merchant.put()
-            merchant_id = merchant.key.id()
-            merchants_data.append(merchant_id)
+            # merchant = MerchantModel(merchant_name=title,
+            #                          merchant_cost=int(cost)
+            #                          )
+            # merchant.put()
+            # merchant_id = merchant.key.id()
+            # merchants_data.append(merchant_id)
+            m = r'\t'.join([title, cost])
+            merchants_data.append(m)
 
-        merchants = '/'.join(str(x) for x in merchants_data)
-        result = ResultDataModel(merchants=merchants, site_name=BASE_URL)
+        merchants = r'\n'.join(str(x) for x in merchants_data)
+        print merchants
+        result = ResultModel(merchants=merchants, site_name=BASE_URL)
         result.put()
         result_id = result.key.id()
 

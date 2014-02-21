@@ -13,18 +13,15 @@
     <table class="table table-bordered table-striped">
         <thead>
             <tr>
-                <th hidden="hidden">ID</th>
                 <th>Name</th>
                 <th>Point</th>
             </tr>
         </thead>
         <tbody>
             {% for merchant in merchants %}
-            {% set merchant_id = merchant.key.id() %}
             <tr>
-                <td hidden="hidden">{{ merchant_id }}</td>
-                <td>{{ merchant.merchant_name }}</td>
-                <td>{{ merchant.merchant_cost }} pts/$</td>
+                <td>{{ merchant }}</td>
+                <td>{{ merchants[merchant] }} pts/$</td>
             </tr>
             {% else %}
             <tr><td colspan="3">No merchants yet</td></tr>

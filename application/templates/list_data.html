@@ -15,6 +15,7 @@
             <tr>
                 <th>ID</th>
                 <th>Scraped on</th>
+                <th>Scraped from</th>
                 <th>&nbsp;</th>
             </tr>
         </thead>
@@ -28,8 +29,9 @@
                     }
                 </script>
             <tr onclick="showMerchants({{ result_id }});">
-                <td id=>{{ result_id }}</td>
+                <td >{{ result_id }}</td>
                 <td class="nowrap">{{ result.timestamp.strftime('%b %d, %Y %I:%M %p') }}</td>
+                <td class="nowrap">{{ result.site_name }}</td>
                 <td>
                     <form method="post" action="{{ url_for('delete_result', result_id=result_id) }}">
                         <button class="btn">Delete</button>

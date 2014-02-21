@@ -19,7 +19,7 @@ from application import app
 from application.grabber.scrape import UltimateRewardsGrabber
 from decorators import login_required, admin_required
 from forms import MerchantForm
-from models import MerchantModel, ResultDataModel
+from models import MerchantModel, ResultDataModel, ResultModel
 
 
 # Flask-Cache (configured to use App Engine Memcache API)
@@ -30,31 +30,30 @@ def home():
     return redirect(url_for('list_results'))
 
 
-@login_required
 def list_results():
     """List all scraped data"""
-    results = ResultDataModel.query()
+    results = ResultModel.query()
 
     return render_template('list_data.html', results=results)
 
 
-@login_required
 def show_result(result_id):
     """List all scraped data"""
-    result = ResultDataModel.get_by_id(result_id)
-    merchants_id = result.merchants.split('/')
-    merchants = []
-    for merchant_id in merchants_id:
-        m = MerchantModel.get_by_id(int(merchant_id))
-        merchants.append(m)
+    result = ResultModel.get_by_id(result_id)
+    result = result.merchants
+    data = result.split(r'\n')
+    merchants = dict()
 
+    for string in data:
+        data = string.split(r'\t')
+        merchants[data[0]] = data[1]
+    print merchants
     return render_template('list_merchants.html', merchants=merchants)
 
 
-@login_required
 def delete_result(result_id):
     """Delete an results object"""
-    result = ResultDataModel.get_by_id(result_id)
+    result = ResultModel.get_by_id(result_id)
     try:
         result.key.delete()
         flash(u'result %s successfully deleted.' % result_id, 'success')
@@ -64,11 +63,10 @@ def delete_result(result_id):
         return redirect(url_for('list_results'))
 
 
-@login_required
 def list_merchants():
     """List all merchants"""
     merchants = MerchantModel.query()
-    return render_template('list_merchants.html', merchants=merchants, form=form)
+    return render_template('list_merchants.html', merchants=merchants)
 
 
 @admin_required

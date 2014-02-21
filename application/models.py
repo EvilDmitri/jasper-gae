@@ -21,3 +21,10 @@ class ResultDataModel(ndb.Model):
     timestamp = ndb.DateTimeProperty(auto_now_add=True)
     site_name = ndb.StringProperty(required=True, default='')
     merchants = ndb.TextProperty(required=True)
+
+
+class ResultModel(ndb.Model):
+    """Scraped data"""
+    timestamp = ndb.DateTimeProperty(auto_now_add=True)
+    site_name = ndb.StringProperty(required=True, default='')
+    merchants = ndb.TextProperty(required=True)
