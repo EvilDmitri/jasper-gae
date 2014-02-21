@@ -18,7 +18,7 @@ from flask_cache import Cache
 from application import app
 from decorators import login_required, admin_required
 from forms import MerchantForm
-from models import MerchantModel
+from models import MerchantModel, ResultDataModel
 
 
 # Flask-Cache (configured to use App Engine Memcache API)
@@ -26,12 +26,28 @@ cache = Cache(app)
 
 
 def home():
-    return redirect(url_for('list_merchants'))
+    return redirect(url_for('list_results'))
 
 
-def say_hello(username):
-    """Contrived merchant to demonstrate Flask's url routing capabilities"""
-    return 'Hello %s' % username
+@login_required
+def list_results():
+    """List all scraped data"""
+    results = ResultDataModel.query()
+
+    return render_template('list_data.html', results=results)
+
+
+@login_required
+def delete_merchant(result_id):
+    """Delete an results object"""
+    merchant = ResultDataModel.get_by_id(result_id)
+    try:
+        merchant.key.delete()
+        flash(u'result %s successfully deleted.' % result_id, 'success')
+        return redirect(url_for('list_results'))
+    except CapabilityDisabledError:
+        flash(u'App Engine Datastore is currently in read-only mode.', 'info')
+        return redirect(url_for('list_results'))
 
 
 @login_required

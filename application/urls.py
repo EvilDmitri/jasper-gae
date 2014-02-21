@@ -18,8 +18,8 @@ app.add_url_rule('/_ah/warmup', 'warmup', view_func=views.warmup)
 # Home page
 app.add_url_rule('/', 'home', view_func=views.home)
 
-# Say hello
-app.add_url_rule('/hello/<username>', 'say_hello', view_func=views.say_hello)
+# merchants list page
+app.add_url_rule('/results', 'list_results', view_func=views.list_results, methods=['GET'])
 
 # merchants list page
 app.add_url_rule('/merchants', 'list_merchants', view_func=views.list_merchants, methods=['GET', 'POST'])
