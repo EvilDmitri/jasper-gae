@@ -23,7 +23,7 @@
     {% for merchant in examples %}
     {% set merchant_id = merchant.key.id() %}
     <tr>
-        <td>{{ example_id }}</td>
+        <td>{{ merchant_id }}</td>
         <td>{{ merchant.merchant_name }}</td>
         <td>{{ merchant.merchant_cost }}</td>
         <td class="nowrap">{{ merchant.timestamp.strftime('%b %d, %Y %I:%M %p') }}</td>

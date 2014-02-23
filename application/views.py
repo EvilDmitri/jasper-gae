@@ -16,7 +16,7 @@ from flask import request, render_template, flash, url_for, redirect
 from flask_cache import Cache
 
 from application import app
-from application.grabber.scrape import UltimateRewardsGrabber
+from application.grabber.scrape import UltimateRewardsGrabber, XmlGrabber
 from decorators import login_required, admin_required
 from models import MerchantModel, ResultModel, SitesModel
 
@@ -24,15 +24,20 @@ from models import MerchantModel, ResultModel, SitesModel
 # Flask-Cache (configured to use App Engine Memcache API)
 cache = Cache(app)
 
-URLS_SHOPPING = {
-        'ultimaterewardsearn.chase.com': 'http://ultimaterewardsearn.chase.com/shopping',
-        'aadvantageeshopping.com': 'https://www.aadvantageeshopping.com/shopping/b____alpha.htm',
-        # 'dividendmilesstorefront.com': 'https://www.dividendmilesstorefront.com/shopping/b____alpha.htm',
-        'onlinemall.my.bestbuy.com': 'https://onlinemall.my.bestbuy.com/shopping/b____alpha.htm',
-        'mileageplusshopping.com': 'https://www.mileageplusshopping.com/shopping/b____alpha.htm',
-        'mileageplanshopping.com': 'https://www.mileageplanshopping.com/shopping/b____alpha.htm',
-        'rapidrewardsshopping.southwest.com': 'https://rapidrewardsshopping.southwest.com/shopping/b____alpha.htm',
-    }
+
+URLS = [
+    'ultimaterewardsearn.chase.com',
+    'aadvantageeshopping.com',
+    # 'dividendmilesstorefront.com',
+    'onlinemall.my.bestbuy.com',
+    # 'mileageplusshopping.com',
+    'mileageplanshopping.com',
+    'rapidrewardsshopping.southwest.com',
+
+    'shop.upromise.com',
+
+    'discover.com',
+]
 
 
 def home():
@@ -42,14 +47,13 @@ def home():
 def sites():
     """List of sites to show"""
     sites_list = SitesModel.query()
-    site_names = URLS_SHOPPING.keys()
-    return render_template('sites.html', site_names=site_names, sites=sites_list)
+    return render_template('sites.html', site_names=URLS, sites=sites_list)
 
 
 def list_results():
     """List all scraped data"""
     results = ResultModel.query()
-    return render_template('list_data.html', results=results)
+    return render_template('list_data.html', site_names=URLS, results=results)
 
 
 def show_result(result_id):
@@ -62,8 +66,7 @@ def show_result(result_id):
     for string in data:
         data = string.split(r'\t')
         merchants[data[0]] = data[1]
-    print merchants
-    return render_template('list_merchants.html', merchants=merchants)
+    return render_template('list_merchants.html', site_names=URLS, merchants=merchants)
 
 
 def delete_result(result_id):
@@ -76,12 +79,6 @@ def delete_result(result_id):
     except CapabilityDisabledError:
         flash(u'App Engine Datastore is currently in read-only mode.', 'info')
         return redirect(url_for('list_results'))
-
-
-def list_merchants():
-    """List all merchants"""
-    merchants = MerchantModel.query()
-    return render_template('list_merchants.html', merchants=merchants)
 
 
 @admin_required
@@ -109,9 +106,12 @@ def grab():
     # Grab data
     if request.method == 'POST':
         site_name = request.form['site_name']
-        print site_name
-        print '----------------'
-        grabber = UltimateRewardsGrabber(site_name)
+
+        if 'discover.com' in site_name:
+            grabber = XmlGrabber(site_name)
+        else:
+            grabber = UltimateRewardsGrabber(site_name)
+
         result_id = grabber.grab()
         flash(u'Successfully grabbed')
         return result_id
