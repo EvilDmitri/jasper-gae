@@ -18,22 +18,37 @@ from flask_cache import Cache
 from application import app
 from application.grabber.scrape import UltimateRewardsGrabber
 from decorators import login_required, admin_required
-from forms import MerchantForm
-from models import MerchantModel, ResultDataModel, ResultModel
+from models import MerchantModel, ResultModel, SitesModel
 
 
 # Flask-Cache (configured to use App Engine Memcache API)
 cache = Cache(app)
 
+URLS_SHOPPING = {
+        'ultimaterewardsearn.chase.com': 'http://ultimaterewardsearn.chase.com/shopping',
+        'aadvantageeshopping.com': 'https://www.aadvantageeshopping.com/shopping/b____alpha.htm',
+        # 'dividendmilesstorefront.com': 'https://www.dividendmilesstorefront.com/shopping/b____alpha.htm',
+        'onlinemall.my.bestbuy.com': 'https://onlinemall.my.bestbuy.com/shopping/b____alpha.htm',
+        'mileageplusshopping.com': 'https://www.mileageplusshopping.com/shopping/b____alpha.htm',
+        'mileageplanshopping.com': 'https://www.mileageplanshopping.com/shopping/b____alpha.htm',
+        'rapidrewardsshopping.southwest.com': 'https://rapidrewardsshopping.southwest.com/shopping/b____alpha.htm',
+    }
+
 
 def home():
-    return redirect(url_for('list_results'))
+    return redirect(url_for('sites'))
+
+
+def sites():
+    """List of sites to show"""
+    sites_list = SitesModel.query()
+    site_names = URLS_SHOPPING.keys()
+    return render_template('sites.html', site_names=site_names, sites=sites_list)
 
 
 def list_results():
     """List all scraped data"""
     results = ResultModel.query()
-
     return render_template('list_data.html', results=results)
 
 
@@ -92,7 +107,11 @@ def warmup():
 
 def grab():
     # Grab data
-    grabber = UltimateRewardsGrabber()
-    result_id = grabber.grab()
-    flash(u'Successfully grabbed')
-    return result_id
+    if request.method == 'POST':
+        site_name = request.form['site_name']
+        print site_name
+        print '----------------'
+        grabber = UltimateRewardsGrabber(site_name)
+        result_id = grabber.grab()
+        flash(u'Successfully grabbed')
+        return result_id

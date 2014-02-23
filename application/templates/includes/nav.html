@@ -15,8 +15,10 @@
                             <b class="caret"></b>
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a href="" onclick="event.preventDefault(); startGrabber();">Scrape 'ultimaterewardsearn.chase.com'</a></li>
-                            <li><a href="#" >Scrape more...</a></li>
+                            {% for site in site_names %}
+                                <li><a href="" onclick="event.preventDefault(); startGrabber('{{ site }}');">Scrape {{ site }}</a></li>
+                            {% endfor %}
+                            <li><a href="">Scrape more</a></li>
                         </ul>
                     </li>
 
@@ -27,7 +29,7 @@
 </div><!-- /navbar -->
 
 <script>
-function startGrabber() {
+function startGrabber(site_name) {
     document.getElementById('title').innerHTML = 'Scraping... Please wait...';
     var xmlhttp;
     if (window.XMLHttpRequest) {// code for IE7+, Firefox, Chrome, Opera, Safari
@@ -42,9 +44,9 @@ function startGrabber() {
           window.location.href = '/';
       }
     };
-    xmlhttp.open("GET","/grab",true);
-    xmlhttp.send();
-
+    xmlhttp.open("POST","grab",true);
+    xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+    xmlhttp.send('&site_name=' + site_name);
 }
 
 </script>

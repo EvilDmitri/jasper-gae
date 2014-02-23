@@ -18,6 +18,9 @@ app.add_url_rule('/_ah/warmup', 'warmup', view_func=views.warmup)
 # Home page
 app.add_url_rule('/', 'home', view_func=views.home)
 
+# site selection page
+app.add_url_rule('/sites', 'sites', view_func=views.sites, methods=['GET'])
+
 # results list page
 app.add_url_rule('/results', 'list_results', view_func=views.list_results, methods=['GET'])
 
@@ -28,7 +31,7 @@ app.add_url_rule('/result/<int:result_id>', 'show_result', view_func=views.show_
 app.add_url_rule('/results/<int:result_id>/delete', view_func=views.delete_result, methods=['POST'])
 
 # ajax grabber
-app.add_url_rule('/grab', 'grab', view_func=views.grab, methods=['GET'])
+app.add_url_rule('/grab', 'grab', view_func=views.grab, methods=['POST'])
 
 # merchants list page
 # app.add_url_rule('/merchants', 'list_merchants', view_func=views.list_merchants, methods=['GET', 'POST'])
