@@ -34,7 +34,7 @@ URLS = [
     'mileageplanshopping.com',
     'rapidrewardsshopping.southwest.com',
 
-    'shop.upromise.com',
+    # 'shop.upromise.com',
 
     'discover.com',
 ]
@@ -52,7 +52,7 @@ def sites():
 
 def list_results():
     """List all scraped data"""
-    results = ResultModel.query()
+    results = ResultModel.query().order(-ResultModel.timestamp).fetch()
     return render_template('list_data.html', site_names=URLS, results=results)
 
 

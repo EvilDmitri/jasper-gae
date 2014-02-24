@@ -167,7 +167,7 @@ class UltimateRewardsGrabber(Grabber):
             title = title
             title = title.replace(' Details', '')
 
-            cost = get_data_from_html(merchants[merchant].text)
+            cost = merchants[merchant].text
             cost = cost
 
             m = r'\t'.join([title, cost])
