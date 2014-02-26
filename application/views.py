@@ -117,3 +117,9 @@ def grab():
         result_id = grabber.grab()
         flash(u'Successfully grabbed')
         return result_id
+
+
+def test():
+    """Test new look"""
+    sites_list = SitesModel.query()
+    return render_template('test.html', site_names=URLS, sites=sites_list)
