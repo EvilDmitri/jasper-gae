@@ -93,7 +93,7 @@ class Grabber():
 
     def save_result(self, merchants_data):
         """Accept list with strings"""
-        merchants = r'\n'.join(str(x) for x in merchants_data)
+        merchants = r'\n'.join(x for x in merchants_data)
         result = ResultModel(merchants=merchants, site_name=self.site_name)
         result.put()
         result_id = result.key.id()
@@ -112,7 +112,6 @@ class XmlGrabber(Grabber):
         self.url = self.URLS[url]
 
     def grab(self):
-        print 'Scraping xml'
         opener = URLOpener()
         website = opener.open(self.url)
         # Save page content to string
@@ -132,8 +131,6 @@ class XmlGrabber(Grabber):
         return result_id
 
 
-
-
 class UltimateRewardsGrabber(Grabber):
     URLS = {
         'ultimaterewardsearn.chase.com': 'http://ultimaterewardsearn.chase.com/shopping',
@@ -150,31 +147,60 @@ class UltimateRewardsGrabber(Grabber):
         self.url = self.URLS[url]
 
     def grab(self):
-        print 'Scraping'
         opener = URLOpener()
         website = opener.open(self.url)
         # Save page content to string
         page = str(website.content)
         tree = html.fromstring(page)
 
-        titles = tree.xpath('//div[@class="mn_srchListSection"]/ul/li/a[@ href="#"]')
+        titles = tree.xpath('//div[@class="mn_srchListSection"]/ul/li/a[@rel="external"]')
+
         costs = tree.xpath('//div[@class="mn_srchListSection"]/ul/li/span')
         merchants = dict(zip(titles, costs))
 
         merchants_data = []
         for merchant in merchants:
             title = get_data_from_html(merchant.text)
-            title = title
-            title = title.replace(' Details', '')
 
-            cost = merchants[merchant].text
-            cost = cost
+            cost = get_data_from_html(merchants[merchant].text_content())
 
             m = r'\t'.join([title, cost])
             merchants_data.append(m)
 
         result_id = self.save_result(merchants_data)
         return result_id
+
+
+class ShopGrabber(Grabber):
+    URLS = {
+        'shop.upromise.com': 'http://shop.upromise.com/mall/view-all-companies'
+    }
+
+    def __init__(self, url):
+        Grabber.__init__(self, url)
+        self.url = self.URLS[url]
+
+    def grab(self):
+        opener = URLOpener()
+        website = opener.open(self.url)
+        # Save page content to string
+        page = str(website.content)
+        tree = html.fromstring(page)
+
+        titles = tree.xpath('//div[@id="allStores"]/ul/li/a')
+        costs = tree.xpath('//div[@id="allStores"]/ul/li')
+        merchants = dict(zip(titles, costs))
+
+        merchants_data = []
+        for merchant in merchants:
+            title = get_data_from_html(merchant.text)
+            cost = get_data_from_html(merchant.tail)
+            m = r'\t'.join([title, cost])
+            merchants_data.append(m)
+
+        result_id = self.save_result(merchants_data)
+        return result_id
+
 
 
 if __name__ == '__main__':

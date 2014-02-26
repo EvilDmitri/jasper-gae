@@ -16,7 +16,7 @@ from flask import request, render_template, flash, url_for, redirect
 from flask_cache import Cache
 
 from application import app
-from application.grabber.scrape import UltimateRewardsGrabber, XmlGrabber
+from application.grabber.scrape import UltimateRewardsGrabber, XmlGrabber, ShopGrabber
 from decorators import login_required, admin_required
 from models import MerchantModel, ResultModel, SitesModel
 
@@ -28,13 +28,13 @@ cache = Cache(app)
 URLS = [
     'ultimaterewardsearn.chase.com',
     'aadvantageeshopping.com',
-    # 'dividendmilesstorefront.com',
+    'dividendmilesstorefront.com',
     'onlinemall.my.bestbuy.com',
-    # 'mileageplusshopping.com',
+    'mileageplusshopping.com',
     'mileageplanshopping.com',
     'rapidrewardsshopping.southwest.com',
 
-    # 'shop.upromise.com',
+    'shop.upromise.com',
 
     'discover.com',
 ]
@@ -109,6 +109,8 @@ def grab():
 
         if 'discover.com' in site_name:
             grabber = XmlGrabber(site_name)
+        elif 'shop.upromise.com' in site_name:
+            grabber = ShopGrabber(site_name)
         else:
             grabber = UltimateRewardsGrabber(site_name)
 
