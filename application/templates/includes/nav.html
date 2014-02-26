@@ -25,6 +25,7 @@
                         </ul>
                     </li>
 
+
                 </ul>
             </div><!--/.nav-collapse -->
         </div><!-- /.navbar .container -->
@@ -47,7 +48,7 @@ function startGrabber(site_name) {
           window.location.href = '/';
       }
     };
-    xmlhttp.open("POST","grab",true);
+    xmlhttp.open("POST","/grab",true);
     xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
     xmlhttp.send('&site_name=' + site_name);
 }

@@ -39,9 +39,9 @@ URLS = [
     'discover.com',
 ]
 
-
-def home():
-    return redirect(url_for('sites'))
+#
+# def home():
+#     return redirect(url_for('test'))
 
 
 def sites():
@@ -59,6 +59,7 @@ def list_results():
 def show_result(result_id):
     """List all scraped data"""
     result = ResultModel.get_by_id(result_id)
+    print result
     result = result.merchants
     data = result.split(r'\n')
     merchants = dict()
@@ -102,6 +103,29 @@ def warmup():
     return ''
 
 
+def test():
+    """Test the new look"""
+    results = ResultModel.query().order(-ResultModel.timestamp).fetch()
+    return render_template('test.html', site_names=URLS, results=results)
+
+
+def test_result(result_id):
+    """Test the new look"""
+    result = ResultModel.get_by_id(int(result_id))
+
+    date = result.timestamp
+
+    result = result.merchants
+    data = result.split(r'\n')
+    merchants = dict()
+    for string in data:
+        data = string.split(r'\t')
+        merchants[data[0]] = data[1]
+
+    results = ResultModel.query().order(-ResultModel.timestamp).fetch()
+    return render_template('test.html', site_names=URLS, results=results, merchants=merchants, date=date)
+
+
 def grab():
     # Grab data
     if request.method == 'POST':
@@ -118,8 +142,3 @@ def grab():
         flash(u'Successfully grabbed')
         return result_id
 
-
-def test():
-    """Test new look"""
-    sites_list = SitesModel.query()
-    return render_template('test.html', site_names=URLS, sites=sites_list)

@@ -7,22 +7,27 @@
 {% endblock %}
 
 {% block content %}
+    <div class="h1" id="title"></div>
+    <form class="navbar-form  pull-right">
+        <input type="text" class="span2" placeholder="Enter date">
 
-        <form class="navbar-form  pull-right">
-            <input type="text" class="span2" placeholder="Enter date">
-            <div class="btn-group">
-                <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-                AM
-                <span class="caret"></span>
-                </a>
-                <ul class="dropdown-menu">
-                <li>AM</li>
-                <li>PM</li>
-                </ul>
-            </div>
-        </form>
+        <select id="time_" style="width: 64px">
+            <option >AM</option>
+            <option >PM</option>
+        </select>
+    </form>
 
+    <div class="nowrap">
 
+        <select id="choose_data" class="nowrap" style="width: 400px">
+            {% for result in results %}
+            {% set result_id = result.key.id() %}
+                <option value="{{ result_id }}" onclick="showResult({{ result_id }})">
+                    {{ ' - '.join([result.site_name, result.timestamp.strftime('%b %d, %Y %I:%M %p')]) }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
 
     <table class="table table-bordered table-striped">
         <thead>
@@ -34,34 +39,18 @@
         </thead>
 
         <tbody>
-            {% for site in sites %}
-                <script>
-                    function showResult(id){
-                        window.location = '/result/' + id;
-                    }
-                </script>
-            {% set site_id = site.key.id() %}
-            <tr>
-                <td class="nowrap">{{ site.site_name }}</td>
-                <td class="nowrap">
-                <select id="{{ site.site_name }}">
-                    {% set results = site.results %}
-                    {% for result in results.split('/') %}
-{#                        {% set result_timestamp = res.key.timestamp() %}#}
-                        <option value="{{ result.split('|')[0] }}">{{ result.split('|')[1] }}</option>
-                    {% endfor %}
-                </select>
-                </td>
-                <td>
-
-                    <button onclick="showResult(document.getElementById('{{ site.site_name }}').value)">Show</button>
-                </td>
-
-            </tr>
-
-            {% else %}
-            <tr><td colspan="2">No site scraped at all</td></tr>
+            {% if merchants %}
+             {% for merchant in merchants %}
+                <tr>
+                    <td>{{ merchant }}</td>
+                    <td>{{ merchants[merchant] }}</td>
+                    <td>{{ date }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="3">No merchants yet</td></tr>
             {% endfor %}
+            {% endif %}
+
         </tbody>
     </table>
 
@@ -70,5 +59,9 @@
 {% endblock content %}
 
 {% block tail_script %}
-
+<script>
+function showResult(result_id) {
+    window.location = '/' + result_id;
+}
+</script>
 {% endblock tail_script %}

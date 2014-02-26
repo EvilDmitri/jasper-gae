@@ -122,7 +122,7 @@ class XmlGrabber(Grabber):
         lines = tree.xpath('//pd')
         for line in lines:
             title = line.attrib['p']
-            cost = ''.join([line.attrib['cbb'] + '% Cashback'])
+            cost = ''.join([str(float(line.attrib['cbb'])*100) + '% Cashback'])
 
             m = r'\t'.join([title, cost])
             merchants_data.append(m)
