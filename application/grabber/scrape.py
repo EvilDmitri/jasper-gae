@@ -204,7 +204,7 @@ class ShopGrabber(Grabber):
 class BestbuyGrabber(Grabber):
     post = {'id': 'pcat17096', 'type': 'page', 'rd': '248', 's': '10001',
             'nrp': '50',
-            # 'ld': '40.75080490112305', 'lg': '-73.99664306640625'
+            'ld': '40.75080490112305', 'lg': '-73.99664306640625'
     }
 
     URLS = {
