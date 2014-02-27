@@ -31,20 +31,38 @@
 
     <table class="table table-bordered table-striped">
         <thead>
-            <tr>
-                <th>Vendor</th>
-                <th>Rate</th>
-                <th>Date Grabbed</th>
-            </tr>
+            {% if site == 'apple' %}
+                <tr>
+                   <th>Name</th>
+                   <th>Model</th>
+                   <th>SKU</th>
+                   <th>Condition</th>
+                   <th>Quantity</th>
+                   <th>Location</th>
+                   <th>Date Grabbed</th>
+                </tr>
+            {% endif %}
+
+            {% if site == '' %}
+                <tr>
+                    <th>Vendor</th>
+                    <th>Rate</th>
+                    <th>Date Grabbed</th>
+                </tr>
+            {% endif %}
+
+
         </thead>
 
         <tbody>
             {% if merchants %}
              {% for merchant in merchants %}
                 <tr>
-                    <td>{{ merchant }}</td>
-                    <td>{{ merchants[merchant] }}</td>
-                    <td>{{ date }}</td>
+                    {% for item in merchant %}
+                        <td>{{ item }}</td>
+                    {% endfor %}
+
+                    <td>{{ date  }}</td>
                 </tr>
                 {% else %}
                 <tr><td colspan="3">No merchants yet</td></tr>

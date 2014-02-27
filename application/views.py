@@ -16,7 +16,7 @@ from flask import request, render_template, flash, url_for, redirect
 from flask_cache import Cache
 
 from application import app
-from application.grabber.scrape import UltimateRewardsGrabber, XmlGrabber, ShopGrabber
+from application.grabber.scrape import UltimateRewardsGrabber, XmlGrabber, ShopGrabber, BestbuyGrabber
 from decorators import login_required, admin_required
 from models import MerchantModel, ResultModel, SitesModel
 
@@ -37,6 +37,8 @@ URLS = [
     'shop.upromise.com',
 
     'discover.com',
+
+    'bestbuy.com'
 ]
 
 #
@@ -115,15 +117,18 @@ def test_result(result_id):
 
     date = result.timestamp
 
+    data = []
+    site = ''
     result = result.merchants
-    data = result.split(r'\n')
-    merchants = dict()
-    for string in data:
-        data = string.split(r'\t')
-        merchants[data[0]] = data[1]
+    lines = result.split(r'\n')
+    for line in lines:
+        items = line.split(r'\t')
+        if len(items) == 6:
+            site = 'apple'
+        data.append(items)
 
     results = ResultModel.query().order(-ResultModel.timestamp).fetch()
-    return render_template('test.html', site_names=URLS, results=results, merchants=merchants, date=date)
+    return render_template('test.html', site_names=URLS, results=results, merchants=data, date=date, site=site)
 
 
 def grab():
@@ -135,6 +140,8 @@ def grab():
             grabber = XmlGrabber(site_name)
         elif 'shop.upromise.com' in site_name:
             grabber = ShopGrabber(site_name)
+        elif 'bestbuy.com' in site_name:
+            grabber = BestbuyGrabber(site_name)
         else:
             grabber = UltimateRewardsGrabber(site_name)
 
