@@ -205,7 +205,7 @@ class BestbuyGrabber(Grabber):
     post = {'id': 'pcat17096', 'type': 'page', 'rd': '248', 's': '10001',
             'nrp': '50',
             'ld': '40.75080490112305', 'lg': '-73.99664306640625'
-    }
+            }
 
     URLS = {
         'bestbuy.com': 'http://www.bestbuy.com/site/olstemplatemapper.jsp?'
@@ -214,6 +214,59 @@ class BestbuyGrabber(Grabber):
     def __init__(self, url):
         Grabber.__init__(self, url)
         self.url = self.URLS[url]
+        self.data = []
+
+    def handle_result(self, rpc):
+        result = rpc.get_result()
+
+        # Save page content to string
+        page = str(result.content)
+        tree = html.fromstring(page)
+
+        divs = tree.xpath('//div[@class="info-main"]')
+
+        for div in divs:
+            name = div.xpath('h3')[0].text_content()
+            if u'Apple' in name or u'apple' in name:
+                try:
+                    model = get_data_from_html(
+                        div.xpath('div[@class="attributes"]/h5/strong[@itemprop="model"]')[0].text_content())
+                except IndexError:
+                    model = ''
+
+                try:
+                    sku = get_data_from_html(
+                        div.xpath('div[@class="attributes"]/h5/strong[@class="sku"]')[0].text_content())
+                except IndexError:
+                    sku = ''
+
+                try:
+                    condition = get_data_from_html(
+                        div.xpath('div[@class="attributes"]/h5/a/strong[@class="sku"]')[0].text_content())
+                except IndexError:
+                    condition = ''
+
+                try:
+                    quantity = get_data_from_html(div.xpath('div[@class="availHolder"]/p/strong')[0].text_content())
+                except IndexError:
+                    quantity = ''
+
+                try:
+                    location = get_data_from_html(div.xpath('div[@class="availHolder"]/strong')[0].text_content())
+                except IndexError:
+                    location = ''
+
+                data_line = r'\t'.join([
+                    name.rstrip().lstrip(), model.rstrip().lstrip(),
+                    sku.rstrip().lstrip(), condition.rstrip().lstrip(),
+                    quantity.rstrip().lstrip(), location.rstrip().lstrip()
+                ])
+                print data_line.encode('utf-8', 'ignore')
+                self.data.append(data_line)
+
+    # Use a helper function to define the scope of the callback.
+    def create_callback(self, rpc):
+        return lambda: self.handle_result(rpc)
 
     def grab(self):
         self.post['cp'] = 1
@@ -222,7 +275,7 @@ class BestbuyGrabber(Grabber):
                                  payload=form_data,
                                  method=urlfetch.POST,
                                  headers={'Content-Type': 'application/x-www-form-urlencoded'}
-                                 )
+        )
 
         # Get the number of pages
         page = str(website.content)
@@ -230,63 +283,24 @@ class BestbuyGrabber(Grabber):
         pages = tree.xpath('//div[@id="showing"]')[0].text_content()
         pages_count = int(pages.split('\n')[-1]) / 50 + 1
 
-        data = []
-        for page_number in range(1, pages_count):
-            print 'page - ', page_number
+        rpcs = []
+        for page_number in range(1, 120):
+            rpc = urlfetch.create_rpc()
+            rpc.callback = self.create_callback(rpc)
+
             self.post['cp'] = page_number
             form_data = urllib.urlencode(self.post)
-            website = urlfetch.fetch(url=self.url,
-                                     payload=form_data,
-                                     method=urlfetch.POST,
-                                     headers={'Content-Type': 'application/x-www-form-urlencoded'}
-                                     )
+            website = urlfetch.make_fetch_call(rpc=rpc,
+                                               url=self.url,
+                                               payload=form_data,
+                                               method=urlfetch.POST,
+                                               headers={'Content-Type': 'application/x-www-form-urlencoded'}
+                                               )
+            rpcs.append(rpc)
+        for rpc in rpcs:
+            rpc.wait()
 
-            # Save page content to string
-            page = str(website.content)
-            tree = html.fromstring(page)
-
-            divs = tree.xpath('//div[@class="info-main"]')
-
-            for div in divs:
-                name = div.xpath('h3')[0].text_content()
-                if u'Apple' in name or u'apple' in name:
-                    try:
-                        model = get_data_from_html(
-                            div.xpath('div[@class="attributes"]/h5/strong[@itemprop="model"]')[0].text_content())
-                    except IndexError:
-                        model = ''
-
-                    try:
-                        sku = get_data_from_html(
-                            div.xpath('div[@class="attributes"]/h5/strong[@class="sku"]')[0].text_content())
-                    except IndexError:
-                        sku = ''
-
-                    try:
-                        condition = get_data_from_html(
-                            div.xpath('div[@class="attributes"]/h5/a/strong[@class="sku"]')[0].text_content())
-                    except IndexError:
-                        condition = ''
-
-                    try:
-                        quantity = get_data_from_html(div.xpath('div[@class="availHolder"]/p/strong')[0].text_content())
-                    except IndexError:
-                        quantity = ''
-
-                    try:
-                        location = get_data_from_html(div.xpath('div[@class="availHolder"]/strong')[0].text_content())
-                    except IndexError:
-                        location = ''
-
-                    data_line = r'\t'.join([
-                        name.rstrip().lstrip(), model.rstrip().lstrip(),
-                        sku.rstrip().lstrip(), condition.rstrip().lstrip(),
-                        quantity.rstrip().lstrip(), location.rstrip().lstrip()
-                    ])
-                    print data_line.encode('utf-8', 'ignore')
-                    data.append(data_line)
-        print data
-        result_id = self.save_result(data)
+        result_id = self.save_result(self.data)
         return result_id
 
 
