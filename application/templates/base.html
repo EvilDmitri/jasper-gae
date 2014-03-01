@@ -7,7 +7,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />
-    <title>{% block title%}Flask on App Engine{% endblock %}</title>
+    <title>{% block title%}Chasing Mallpoints Scraper{% endblock %}</title>
     <link href="/static/css/bootstrap-{{ bootstrap_version }}.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="/static/css/font-awesome.min.css">
     <style> body { padding-top: 90px; } </style> <!-- Bootstrap -->
@@ -35,6 +35,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/{{ jquery_version }}/jquery.min.js"></script>
     <script src="/static/js/lib/bootstrap-{{ bootstrap_version }}.min.js"></script>
     <script src="/static/js/main.js"></script>
+    <script src="/static/js/sorttable.js"></script>
     {% block tail_script %}{# defer-capable JS block #}{% endblock %}
     {{ profiler_includes|safe }}
 </body>

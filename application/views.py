@@ -38,7 +38,7 @@ URLS = [
 
     'discover.com',
 
-    'bestbuy.com'
+    'www.bestbuy.com'
 ]
 
 #
@@ -140,7 +140,7 @@ def grab():
             grabber = XmlGrabber(site_name)
         elif 'shop.upromise.com' in site_name:
             grabber = ShopGrabber(site_name)
-        elif 'bestbuy.com' in site_name:
+        elif 'www.bestbuy.com' in site_name:
             grabber = BestbuyGrabber(site_name)
         else:
             grabber = UltimateRewardsGrabber(site_name)

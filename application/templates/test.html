@@ -29,8 +29,8 @@
         </select>
     </div>
 
-    <table class="table table-bordered table-striped" >
-        <thead>
+    <table class="table table-bordered table-striped sortable" >
+        <thead style="background-color:#eee; font-weight: bold; cursor: default;">
             {% if site == 'apple'  %}
                 <tr>
                    <th >Name</th>
@@ -46,7 +46,7 @@
             {% if site == '' %}
                 <tr>
                     <th>Vendor</th>
-                    <th>Rate</th>
+                    <th class="sorttable_numeric">Rate</th>
                     <th>Date Grabbed</th>
                 </tr>
             {% endif %}

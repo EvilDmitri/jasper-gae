@@ -159,9 +159,9 @@ class UltimateRewardsGrabber(Grabber):
 
         merchants_data = []
         for merchant in merchants:
-            title = get_data_from_html(merchant.text)
+            title = merchant.text
 
-            cost = get_data_from_html(merchants[merchant].text_content())
+            cost = merchants[merchant].text_content()
 
             m = r'\t'.join([title, cost])
             merchants_data.append(m)
@@ -203,7 +203,7 @@ class ShopGrabber(Grabber):
 
 class BestbuyGrabber(Grabber):
     post = {'id': 'pcat17096', 'type': 'page', 'rd': '248', 's': '10001',
-            'nrp': '50',
+            'nrp': '150',
             'ld': '40.75080490112305', 'lg': '-73.99664306640625'
             }
 
@@ -284,7 +284,7 @@ class BestbuyGrabber(Grabber):
         pages_count = int(pages.split('\n')[-1]) / 50 + 1
 
         rpcs = []
-        for page_number in range(1, 120):
+        for page_number in range(1, 50):
             rpc = urlfetch.create_rpc()
             rpc.callback = self.create_callback(rpc)
 
