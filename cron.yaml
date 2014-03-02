@@ -1,0 +1,8 @@
+cron:
+- description: daily-summary-job
+  url: /grabber/daily
+  schedule: every day 00:00
+
+- description: daily-summary-job
+  url: /grabber/daily
+  schedule: every day 12:00

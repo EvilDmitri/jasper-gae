@@ -38,7 +38,7 @@ URLS = [
 
     'discover.com',
 
-    'www.bestbuy.com'
+    # 'www.bestbuy.com'
 ]
 
 #
@@ -149,3 +149,21 @@ def grab():
         flash(u'Successfully grabbed')
         return result_id
 
+
+def grab_daily():
+    success = 0
+    for site_name in URLS:
+        if 'discover.com' in site_name:
+            grabber = XmlGrabber(site_name)
+            grabber.grab()
+        elif 'shop.upromise.com' in site_name:
+            grabber = ShopGrabber(site_name)
+            grabber.grab()
+        # elif 'www.bestbuy.com' in site_name:
+        #     grabber = BestbuyGrabber(site_name)
+        else:
+            grabber = UltimateRewardsGrabber(site_name)
+            grabber.grab()
+        if grabber:
+            success += 1
+    return 'OK'

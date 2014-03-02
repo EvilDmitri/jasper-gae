@@ -208,7 +208,7 @@ class BestbuyGrabber(Grabber):
             }
 
     URLS = {
-        'bestbuy.com': 'http://www.bestbuy.com/site/olstemplatemapper.jsp?'
+        'www.bestbuy.com': 'http://www.bestbuy.com/site/olstemplatemapper.jsp?'
     }
 
     def __init__(self, url):
