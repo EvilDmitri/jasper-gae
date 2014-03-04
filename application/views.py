@@ -33,6 +33,8 @@ URLS = [
     'mileageplusshopping.com',
     'mileageplanshopping.com',
     'rapidrewardsshopping.southwest.com',
+    'barclaycardrewardsboost.com',
+    'skymilesshopping.com',
 
     'shop.upromise.com',
 

@@ -139,6 +139,9 @@ class UltimateRewardsGrabber(Grabber):
         'mileageplusshopping.com': 'https://www.mileageplusshopping.com/shopping/b____alpha.htm',
         'mileageplanshopping.com': 'https://www.mileageplanshopping.com/shopping/b____alpha.htm',
         'rapidrewardsshopping.southwest.com': 'https://rapidrewardsshopping.southwest.com/shopping/b____alpha.htm',
+        'barclaycardrewardsboost.com': 'https://www.barclaycardrewardsboost.com/shopping/b____alpha.htm',
+        'skymilesshopping.com': 'http://www.skymilesshopping.com/shopping/b____alpha.htm',
+
     }
 
     def __init__(self, url):
