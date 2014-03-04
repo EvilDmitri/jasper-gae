@@ -21,6 +21,11 @@ app.add_url_rule('/', 'test', view_func=views.test, methods=['GET'])
 # Test Show Result
 app.add_url_rule('/<int:result_id>', 'test_result', view_func=views.test_result, methods=['GET', 'POST'])
 
+app.add_url_rule('/last/', 'by_time', view_func=views.by_time, methods=['GET', 'POST'])
+
+# All Malls
+app.add_url_rule('/all_malls', 'all_malls', view_func=views.all_malls, methods=['GET'])
+
 
 # site selection page
 app.add_url_rule('/sites', 'sites', view_func=views.sites, methods=['GET'])
@@ -34,9 +39,9 @@ app.add_url_rule('/result/<int:result_id>', 'show_result', view_func=views.show_
 # Delete a result
 app.add_url_rule('/result/<int:result_id>/delete', view_func=views.delete_result, methods=['POST'])
 
+
 # ajax grabber
 app.add_url_rule('/grab', 'grab', view_func=views.grab, methods=['POST'])
-
 
 # cron grabber
 app.add_url_rule('/grabber/daily', 'grab_daily', view_func=views.grab_daily, methods=['GET'])

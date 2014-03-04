@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block style_block %}
+    <style type="text/css">
+        table.table { width: 60%; }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="h1" id="title"></div>
+    <form class="navbar-form  pull-right">
+        <input type="text" class="span2" placeholder="Enter date">
+
+        <select id="time_" style="width: 64px">
+            <option >AM</option>
+            <option >PM</option>
+        </select>
+    </form>
+
+    <div class="nowrap">
+
+        <select id="choose_data" class="nowrap" style="width: 400px">
+            {% for result in results %}
+            {% set result_id = result.key.id() %}
+                <option value="{{ result_id }}" onclick="showResult({{ result_id }})">
+                    {{ ' - '.join([result.site_name, result.timestamp.strftime('%b %d, %Y %I:%M %p')]) }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <h3>
+        Results from all sources from the last time {% if date %}
+                                                    (Now is
+                                                    {{ date }}
+                                                    )
+                                              {% endif %}
+    </h3>
+
+    <table class="table table-bordered table-striped sortable" >
+        <thead style="background-color:#eee; font-weight: bold; cursor: default;">
+            {% if site == 'apple'  %}
+                <tr>
+                   <th >Name</th>
+                   <th>Model</th>
+                   <th>SKU</th>
+                   <th>Condition</th>
+                   <th>Quantity</th>
+                   <th>Location</th>
+                   <th>Date Grabbed</th>
+                </tr>
+            {% endif %}
+
+            {% if site == '' %}
+                <tr>
+                    <th>Vendor</th>
+
+                    {% for date in dates %}
+                        <th>{{ date }}</th>
+                    {% endfor %}
+                </tr>
+            {% endif %}
+
+
+        </thead>
+
+        <tbody>
+            {% if data %}
+                {% for vendor in data %}
+                    <tr>
+                        <td>{{ vendor }}</td>
+                        {% set rates = data[vendor] %}
+                        {% for rate in rates %}
+                            <td class="sorttable_numeric">{{ rates[rate] }}</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            {% else %}
+                <tr><td colspan="3">No data on this date - {{ date }}</td></tr>
+            {% endif %}
+
+        </tbody>
+    </table>
+
+
+
+{% endblock content %}
+
+{% block tail_script %}
+<script>
+function showResult(result_id) {
+    window.location = '/' + result_id;
+}
+</script>
+{% endblock tail_script %}

@@ -8,7 +8,9 @@ For merchant the *say_hello* handler, handling the URL route '/hello/<username>'
   must be passed *username* as the argument.
 
 """
+import datetime
 from google.appengine.api import users
+from google.appengine.ext import ndb
 from google.appengine.runtime.apiproxy_errors import CapabilityDisabledError
 
 from flask import request, render_template, flash, url_for, redirect
@@ -20,6 +22,7 @@ from application.grabber.scrape import UltimateRewardsGrabber, XmlGrabber, ShopG
 from decorators import login_required, admin_required
 from models import MerchantModel, ResultModel, SitesModel
 
+from collections import OrderedDict
 
 # Flask-Cache (configured to use App Engine Memcache API)
 cache = Cache(app)
@@ -113,8 +116,11 @@ def test():
     return render_template('test.html', site_names=URLS, results=results)
 
 
+#------------------------------------------
+# Main page
+#------------------------------------------
 def test_result(result_id):
-    """Test the new look"""
+    """Main page"""
     result = ResultModel.get_by_id(int(result_id))
 
     date = result.timestamp
@@ -126,13 +132,83 @@ def test_result(result_id):
     for line in lines:
         items = line.split(r'\t')
         if len(items) == 6:
-            site = 'apple'
+            site = 'apple'      # This is needed for 'www.bestbuy.com'
         data.append(items)
 
     results = ResultModel.query().order(-ResultModel.timestamp).fetch()
     return render_template('test.html', site_names=URLS, results=results, merchants=data, date=date, site=site)
 
 
+def by_time():
+    """Response up to 5 last 5 results"""
+    site = ''
+    if request.method == 'POST':
+        start_time = request.form['start_time']  # {0}
+        # start_time = datetime.datetime(start_time).strptime()
+    else:
+        start_time = datetime.datetime.now()
+    # end_time = start_time - datetime.timedelta(days=5)  # {1}
+    # q = "SELECT * FROM ResultModel WHERE timestamp < DATETIME({0}) AND  timestamp > DATE({1})".format(
+    # start_time, end_time)
+
+    date = start_time.strftime('%Y-%m-%d %H:%M:%S')
+    # q = "SELECT * FROM ResultModel  WHERE timestamp <= DATETIME('%s')" % date
+    # data_entries = ndb.gql(q).fetch()
+    # print(q)
+
+    results = ResultModel.query().order(-ResultModel.timestamp).fetch()
+    return render_template('test.html', site_names=URLS, results=results,  site=site)
+
+
+#------------------------------------------
+# Method list all last results
+#------------------------------------------
+def all_malls():
+    """Response all malls from last job"""
+    start_time = datetime.datetime.now()
+    sites_result = OrderedDict()
+    for url in URLS:
+        sites_result[url] = ''
+
+    date = start_time.strftime('%Y-%m-%d %H:%M:%S')
+
+    results = ResultModel.query().order(-ResultModel.timestamp).fetch()
+    last_results = results[-10:]
+    data_entries = last_results
+
+    data = OrderedDict([[x, ''] for x in URLS])
+    sources = []
+    data = dict()
+    for entry in data_entries:
+        date_scraped = entry.timestamp
+        scraped_from = entry.site_name
+        sources.append('\n'.join([scraped_from, date_scraped.strftime('%Y-%m-%d %H:%M:%S')]))
+        vendors = entry.merchants
+        vendors = vendors.split(r'\n')
+
+        for vendor in vendors:
+            result = vendor.split(r'\t')
+
+            name = result[0]
+            try:
+                rate = result[1]
+            except ValueError:
+                rate = 'NNNN'
+
+            try:    # If this vendor is listed
+                rates = data[name]
+            except KeyError:
+                rates = sites_result
+            rates[scraped_from] = rate
+
+            data[name] = rates
+
+    results = ResultModel.query().order(-ResultModel.timestamp).fetch()
+    return render_template('all_malls.html', site_names=URLS, results=results, date=date, dates=URLS, data=data, site='')
+
+#------------------------------------------
+# Method run grabber from web-page
+#------------------------------------------
 def grab():
     # Grab data
     if request.method == 'POST':
@@ -152,6 +228,9 @@ def grab():
         return result_id
 
 
+#------------------------------------------
+# Method for Cron job to everyday scraping
+#------------------------------------------
 def grab_daily():
     success = 0
     for site_name in URLS:
