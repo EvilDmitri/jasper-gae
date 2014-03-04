@@ -155,15 +155,13 @@ def grab_daily():
     for site_name in URLS:
         if 'discover.com' in site_name:
             grabber = XmlGrabber(site_name)
-            grabber.grab()
         elif 'shop.upromise.com' in site_name:
             grabber = ShopGrabber(site_name)
-            grabber.grab()
         # elif 'www.bestbuy.com' in site_name:
         #     grabber = BestbuyGrabber(site_name)
         else:
             grabber = UltimateRewardsGrabber(site_name)
-            grabber.grab()
-        if grabber:
+
+        if grabber.grab():
             success += 1
     return 'OK'
