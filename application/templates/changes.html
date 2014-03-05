@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block style_block %}
+    <style type="text/css">
+        table.table { width: 60%; }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="h1" id="title"></div>
+    <form class="navbar-form  pull-right">
+        <input type="text" class="span2" placeholder="Enter date">
+
+        <select id="time_" style="width: 64px">
+            <option >AM</option>
+            <option >PM</option>
+        </select>
+    </form>
+
+
+
+    <h3>
+        Changes from previous to last scrape
+    </h3>
+
+    <table class="table table-bordered table-striped sortable" >
+        <thead style="background-color:#eee; font-weight: bold; cursor: default;">
+
+
+
+        </thead>
+
+        <tbody>
+                {% for site in sites %}
+                    <tr>
+                        <td>{{ site }}</td>
+                        {% set changes = sites[site] %}
+
+                        {% for change in changes %}
+                            <td>
+                                {{ change }}
+                            </td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+
+        </tbody>
+    </table>
+
+
+
+{% endblock content %}
+
+{% block tail_script %}
+<script>
+function showResult(result_id) {
+    window.location = '/' + result_id;
+}
+</script>
+{% endblock tail_script %}

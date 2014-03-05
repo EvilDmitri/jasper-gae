@@ -46,6 +46,9 @@ app.add_url_rule('/grab', 'grab', view_func=views.grab, methods=['POST'])
 # cron grabber
 app.add_url_rule('/grabber/daily', 'grab_daily', view_func=views.grab_daily, methods=['GET'])
 
+# cron grabber
+app.add_url_rule('/compare', 'check_modification', view_func=views.check_modification, methods=['GET'])
+
 # merchants list page
 # app.add_url_rule('/merchants', 'list_merchants', view_func=views.list_merchants, methods=['GET', 'POST'])
 

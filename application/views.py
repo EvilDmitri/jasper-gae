@@ -66,7 +66,6 @@ def list_results():
 def show_result(result_id):
     """List all scraped data"""
     result = ResultModel.get_by_id(result_id)
-    print result
     result = result.merchants
     data = result.split(r'\n')
     merchants = dict()
@@ -80,6 +79,18 @@ def show_result(result_id):
 def delete_result(result_id):
     """Delete an results object"""
     result = ResultModel.get_by_id(result_id)
+
+    # Should delete result from site model
+    site = result.site_name
+    q = "SELECT * FROM ResultModel  WHERE site_name = '%s'" % site
+    data_entry = ndb.gql(q).fetch()
+    results = data_entry.results.split('/')
+    for result in results:
+        if str(result_id) in result:
+            results.remove(result)
+    data_entry.results = '/'.join(results)
+    data_entry.put()
+
     try:
         result.key.delete()
         flash(u'result %s successfully deleted.' % result_id, 'success')
@@ -166,9 +177,6 @@ def by_time():
 def all_malls():
     """Response all malls from last job"""
     start_time = datetime.datetime.now()
-    sites_result = OrderedDict()
-    for url in URLS:
-        sites_result[url] = ''
 
     date = start_time.strftime('%Y-%m-%d %H:%M:%S')
 
@@ -176,13 +184,15 @@ def all_malls():
     last_results = results[-10:]
     data_entries = last_results
 
-    data = OrderedDict([[x, ''] for x in URLS])
-    sources = []
+    sites = OrderedDict([[x, ' '] for x in URLS])
+    headers = OrderedDict([[x, ' '] for x in URLS])
     data = dict()
     for entry in data_entries:
         date_scraped = entry.timestamp
         scraped_from = entry.site_name
-        sources.append('\n'.join([scraped_from, date_scraped.strftime('%Y-%m-%d %H:%M:%S')]))
+        # Table header
+        headers[scraped_from] = ('\n'.join([scraped_from, date_scraped.strftime('%Y-%m-%d %H:%M:%S')]))
+
         vendors = entry.merchants
         vendors = vendors.split(r'\n')
 
@@ -193,18 +203,29 @@ def all_malls():
             try:
                 rate = result[1]
             except ValueError:
-                rate = 'NNNN'
+                rate = ' '
 
             try:    # If this vendor is listed
                 rates = data[name]
             except KeyError:
-                rates = sites_result
+                rates = sites
             rates[scraped_from] = rate
 
             data[name] = rates
 
-    results = ResultModel.query().order(-ResultModel.timestamp).fetch()
-    return render_template('all_malls.html', site_names=URLS, results=results, date=date, dates=URLS, data=data, site='')
+    # for vendor in data:
+    #     rates = data[vendor]
+    #     res = []
+    #     for rate in rates:
+    #         rate = rates[rate]
+    #         res.append(rate)
+    #     print vendor, ' - ', res
+    # print '----------'
+    # results = ResultModel.query().order(-ResultModel.timestamp).fetch()
+    return render_template('all_malls.html', site_names=URLS,
+                           date=date,
+                           headers=headers, data=data,
+                           site='')
 
 #------------------------------------------
 # Method run grabber from web-page
@@ -246,3 +267,74 @@ def grab_daily():
         if grabber.grab():
             success += 1
     return 'OK'
+
+#------------------------------------------
+# Method for check last result with previous
+#------------------------------------------
+def check_modification():
+    def get_data(result_id):
+        """Get data from DB by id
+        Return dictionary with 'name': 'rate'
+        """
+        result = ResultModel.get_by_id(int(result_id))
+        try:
+            result = result.merchants
+        except AttributeError:
+            return False
+
+        data = result.split(r'\n')
+        merchants = dict()
+        for item in data:
+            res = item.split(r'\t')
+            name = res[0]
+            rate = res[1].split(' ')[0]
+            merchants[name] = rate
+        return merchants
+
+    def compare_data(last, prev):
+        """Receive two dictionary with 'name': 'rate'
+        If some of them is changed should alert?
+        """
+        list_of_changes = []
+        for name in last:
+            last_rate = last[name]
+            try:
+                prev_rate = prev[name]
+                if last_rate != prev_rate:
+                    changed = name + ' ' + prev_rate + '/' + last_rate
+                    list_of_changes.append(changed)
+            except KeyError:
+                changed = name + ' ' + ' ' + '/' + last_rate
+                list_of_changes.append(changed)
+
+        return list_of_changes
+
+    sites = SitesModel.query().order().fetch()
+    changed_sites = OrderedDict([[x, ' '] for x in URLS])
+    for site in sites:
+        results = site.results
+        lasts = results.split('/')
+        if len(lasts) < 2:
+            # Only one result
+            continue
+
+        last = lasts[-1].split('|')[0]  # [1] - timestamp
+        last_result = get_data(last)
+
+        i = -2
+        while True:
+            prev = lasts[i].split('|')[0]
+            prev_result = get_data(prev)
+            if prev_result:
+                break
+            i -= 1
+        # Now we have IDs
+
+        changes = compare_data(last_result, prev_result)
+        if len(changes) > 0:
+            changed_sites[site.site_name] = changes
+
+    return render_template('changes.html', site_names=URLS,
+                           sites=changed_sites,
+                           site='')
+
