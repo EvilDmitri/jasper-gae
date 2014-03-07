@@ -32,8 +32,6 @@ class SitesModel(ndb.Model):
 class BestbuyComModel(ndb.Model):
     """Bestbuy.Com Model
     Data format:
-
     """
-
     data = ndb.StringProperty(required=True, default='')
     timestamp = ndb.DateTimeProperty(auto_now_add=True)

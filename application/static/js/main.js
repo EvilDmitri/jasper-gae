@@ -15,4 +15,10 @@ var Utils = {
     }
 };
 
-/* Your custom JavaScript here */
+
+
+
+$(function() {
+    $( "#datepicker" ).datepicker();
+});
+

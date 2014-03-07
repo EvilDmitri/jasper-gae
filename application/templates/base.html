@@ -21,6 +21,26 @@
     <div id="header">
         {% include 'includes/nav.html' %} {# pull in navbar #}
     </div>
+
+{#    DATE#}
+    <div class="h1" id="title"></div>
+
+    <form name="date_form" class="pull-right" action="/search" method="POST">
+        <fieldset>
+            <input name="date" type="text" placeholder="Select date" id="datepicker">
+
+            <select name="time" id="time_" style="width: 64px">
+                <option >AM</option>
+                <option >PM</option>
+            </select>
+            <br>
+            <button type="submit" class="btn">Show</button>
+{#            <a  class="btn btn-primary">Show</a>#}
+        </fieldset>
+    </form>
+
+
+
     <div class="container" id="maincontent">
         {% include 'includes/flash_message.html' %} {# page-level feedback notices #}
         <div id="body_content">
@@ -36,6 +56,8 @@
     <script src="/static/js/lib/bootstrap-{{ bootstrap_version }}.min.js"></script>
     <script src="/static/js/main.js"></script>
     <script src="/static/js/sorttable.js"></script>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
+    <script src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
     {% block tail_script %}{# defer-capable JS block #}{% endblock %}
     {{ profiler_includes|safe }}
 </body>

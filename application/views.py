@@ -338,3 +338,17 @@ def check_modification():
                            sites=changed_sites,
                            site='')
 
+
+#------------------------------------------
+# Method for check last result with previous
+#------------------------------------------
+def search_result_by_time():
+    if request.method == 'POST':
+        date = request.form['date']
+        time = request.form['time']
+
+    q = "SELECT * FROM ResultModel  WHERE site_name = '%s'" % site
+    data_entry = ndb.gql(q).fetch()
+
+    return render_template('changes.html')
+    # redirect("/result/%s" % result_id)

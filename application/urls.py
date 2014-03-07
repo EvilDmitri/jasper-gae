@@ -40,14 +40,17 @@ app.add_url_rule('/result/<int:result_id>', 'show_result', view_func=views.show_
 app.add_url_rule('/result/<int:result_id>/delete', view_func=views.delete_result, methods=['POST'])
 
 
-# ajax grabber
+# Ajax grabber
 app.add_url_rule('/grab', 'grab', view_func=views.grab, methods=['POST'])
 
-# cron grabber
+# Cron grabber
 app.add_url_rule('/grabber/daily', 'grab_daily', view_func=views.grab_daily, methods=['GET'])
 
-# cron grabber
+# Compares last results
 app.add_url_rule('/compare', 'check_modification', view_func=views.check_modification, methods=['GET'])
+
+# Search by date
+app.add_url_rule('/search', 'search_result_by_time', view_func=views.search_result_by_time, methods=['GET', 'POST'])
 
 # merchants list page
 # app.add_url_rule('/merchants', 'list_merchants', view_func=views.list_merchants, methods=['GET', 'POST'])
