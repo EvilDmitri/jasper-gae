@@ -345,10 +345,12 @@ def check_modification():
 def search_result_by_time():
     if request.method == 'POST':
         date = request.form['date']
+
         time = request.form['time']
+        end_date = datetime.datetime.strptime(date + ' 00:00', '%m/%d/%Y %H:%M')
+        start_date = end_date + datetime.timedelta(days=1)
 
-    q = "SELECT * FROM ResultModel  WHERE site_name = '%s'" % site
-    data_entry = ndb.gql(q).fetch()
 
-    return render_template('changes.html')
-    # redirect("/result/%s" % result_id)
+    q = "SELECT * FROM ResultModel WHERE timestamp <= DATETIME('%s') AND timestamp >= DATETIME('%s')" % (start_date, end_date)
+    results = ndb.gql(q).fetch()
+    return render_template('list_data.html', site_names=URLS, results=results)
