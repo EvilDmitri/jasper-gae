@@ -137,7 +137,7 @@ def test_result(result_id):
     date = result.timestamp
 
     data = []
-    site = ''
+    site = result.site_name
     result = result.merchants
     lines = result.split(r'\n')
     for line in lines:
