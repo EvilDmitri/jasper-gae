@@ -268,6 +268,7 @@ def grab_daily():
             success += 1
     return 'OK'
 
+
 #------------------------------------------
 # Method for check last result with previous
 #------------------------------------------
@@ -333,6 +334,27 @@ def check_modification():
         changes = compare_data(last_result, prev_result)
         if len(changes) > 0:
             changed_sites[site.site_name] = changes
+
+    # Mail results
+    from mailer.mail_send import SendStatistics
+    result = ''
+
+    stat = False
+    for val in changed_sites.itervalues():
+        if val is not ' ':
+            print val
+            stat = True
+            break
+    print '------------------------------'
+
+    if stat:
+        for k in changed_sites:
+            data = ' '.join([k, changed_sites[k]])
+            result = '\n'.join([result, data])
+
+        stats = SendStatistics()
+        stats.post(data=result)
+
 
     return render_template('changes.html', site_names=URLS,
                            sites=changed_sites,
