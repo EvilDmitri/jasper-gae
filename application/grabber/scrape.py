@@ -204,6 +204,42 @@ class ShopGrabber(Grabber):
         return result_id
 
 
+class RetailersGrabber(Grabber):
+    URLS = {
+        'shop.amtrakguestrewards.com': 'http://shop.amtrakguestrewards.com/az',
+        'shop.lifemiles.com': 'http://shop.lifemiles.com/en/az'
+    }
+
+    def __init__(self, url):
+        Grabber.__init__(self, url)
+        self.url = self.URLS[url]
+        self.merchants_data = []
+
+    def grab(self):
+
+        opener = URLOpener()
+        website = opener.open(self.url)
+        # Save page content to string
+        page = str(website.content)
+        tree = html.fromstring(page)
+
+        data = tree.xpath('//div[@class="merch-full"]/a')
+        for merch in data:
+            title = get_data_from_html(merch[1].text)
+            cost = get_data_from_html(merch[2].text)
+            m = r'\t'.join([title, cost])
+            self.merchants_data.append(m)
+        next_page = tree.xpath('//div[@class="paging"]/ul/li[@class="next"]/a')
+        print next_page[0].values()[0]
+        try:
+            next_page = tree.xpath('//div[@class="paging"]/ul/li[@class="ne"]/a')[0]
+            self.url = 'http://shop.amtrakguestrewards.com/' + next_page.values()[0]
+            self.grab()
+        except IndexError:
+            result_id = self.save_result(self.merchants_data)
+            return result_id
+
+
 class BestbuyGrabber(Grabber):
     post = {'id': 'pcat17096', 'type': 'page', 'rd': '248', 's': '10001',
             'nrp': '150',

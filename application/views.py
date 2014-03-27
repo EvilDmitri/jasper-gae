@@ -18,7 +18,8 @@ from flask import request, render_template, flash, url_for, redirect
 from flask_cache import Cache
 
 from application import app
-from application.grabber.scrape import UltimateRewardsGrabber, XmlGrabber, ShopGrabber, BestbuyGrabber
+from application.grabber.scrape import UltimateRewardsGrabber, XmlGrabber, ShopGrabber, \
+                                    BestbuyGrabber, RetailersGrabber
 from decorators import login_required, admin_required
 from models import MerchantModel, ResultModel, SitesModel
 
@@ -44,6 +45,9 @@ URLS = [
     'discover.com',
 
     # 'www.bestbuy.com'
+
+    'shop.amtrakguestrewards.com',
+    'shop.lifemiles.com'
 ]
 
 #
@@ -241,6 +245,8 @@ def grab():
             grabber = ShopGrabber(site_name)
         elif 'www.bestbuy.com' in site_name:
             grabber = BestbuyGrabber(site_name)
+        elif site_name in ['shop.amtrakguestrewards.com', 'shop.lifemiles.com']:
+            grabber = RetailersGrabber(site_name)
         else:
             grabber = UltimateRewardsGrabber(site_name)
 
@@ -259,6 +265,9 @@ def grab_daily():
             grabber = XmlGrabber(site_name)
         elif 'shop.upromise.com' in site_name:
             grabber = ShopGrabber(site_name)
+
+        elif site_name in ['shop.amtrakguestrewards.com', 'shop.lifemiles.com']:
+            grabber = RetailersGrabber(site_name)
         # elif 'www.bestbuy.com' in site_name:
         #     grabber = BestbuyGrabber(site_name)
         else:
@@ -365,13 +374,14 @@ def check_modification():
 #------------------------------------------
 def search_result_by_time():
     if request.method == 'POST':
-        date = request.form['date']
-
         time = request.form['time']
-        end_date = datetime.datetime.strptime(date + ' 00:00', '%m/%d/%Y %H:%M')
-        start_date = end_date + datetime.timedelta(days=1)
+        date = request.form['date']
+        try:
+            end_date = datetime.datetime.strptime(date + ' 00:00', '%m/%d/%Y %H:%M')
+            start_date = end_date + datetime.timedelta(days=1)
+            q = "SELECT * FROM ResultModel WHERE timestamp <= DATETIME('%s') AND timestamp >= DATETIME('%s')" % (start_date, end_date)
+            results = ndb.gql(q).fetch()
+        except ValueError:
+            results = ''
 
-
-    q = "SELECT * FROM ResultModel WHERE timestamp <= DATETIME('%s') AND timestamp >= DATETIME('%s')" % (start_date, end_date)
-    results = ndb.gql(q).fetch()
     return render_template('list_data.html', site_names=URLS, results=results)
