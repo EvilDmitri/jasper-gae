@@ -229,8 +229,7 @@ class RetailersGrabber(Grabber):
             cost = get_data_from_html(merch[2].text)
             m = r'\t'.join([title, cost])
             self.merchants_data.append(m)
-        next_page = tree.xpath('//div[@class="paging"]/ul/li[@class="next"]/a')
-        print next_page[0].values()[0]
+
         try:
             next_page = tree.xpath('//div[@class="paging"]/ul/li[@class="ne"]/a')[0]
             self.url = 'http://shop.amtrakguestrewards.com/' + next_page.values()[0]
