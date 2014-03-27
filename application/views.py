@@ -342,19 +342,18 @@ def check_modification():
     stat = False
     for val in changed_sites.itervalues():
         if val is not ' ':
-            print val
             stat = True
             break
-    print '------------------------------'
 
     if stat:
-        for k in changed_sites:
-            data = ' '.join([k, changed_sites[k]])
+        for k in changed_sites.iterkeys():
+            change = changed_sites[k]
+            change = ' '.join(change[0].split('/'))
+            data = ' '.join([str(k), str(change)])
             result = '\n'.join([result, data])
 
         stats = SendStatistics()
         stats.post(data=result)
-
 
     return render_template('changes.html', site_names=URLS,
                            sites=changed_sites,
