@@ -19,7 +19,7 @@ from flask_cache import Cache
 
 from application import app
 from application.grabber.scrape import UltimateRewardsGrabber, XmlGrabber, ShopGrabber, \
-                                    BestbuyGrabber, RetailersGrabber
+                                    BestbuyGrabber, RetailersGrabber, get_data_from_html
 from decorators import login_required, admin_required
 from models import MerchantModel, ResultModel, SitesModel
 
@@ -346,8 +346,6 @@ def check_modification():
 
     # Mail results
     from mailer.mail_send import SendStatistics
-    result = ''
-
     stat = False
     for val in changed_sites.itervalues():
         if val is not ' ':
@@ -355,11 +353,17 @@ def check_modification():
             break
 
     if stat:
+        result = ''
         for k in changed_sites.iterkeys():
-            change = changed_sites[k]
-            change = ' '.join(change[0].split('/'))
-            data = ' '.join([str(k), str(change)])
-            result = '\n'.join([result, data])
+            changes = changed_sites[k]
+            changed_cost = ''
+            for change in changes:
+                change = ' '.join(get_data_from_html(change).split('/$'))
+                if change:
+                    changed_cost = '; '.join([change, changed_cost])
+            if changed_cost:
+                line = ' '.join([k, changed_cost])
+                result = '\n'.join([result, line])
 
         stats = SendStatistics()
         stats.post(data=result)
