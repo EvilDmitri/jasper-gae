@@ -188,8 +188,8 @@ def all_malls():
     last_results = results[-10:]
     data_entries = last_results
 
-    sites = OrderedDict([[x, ' '] for x in URLS])
-    headers = OrderedDict([[x, ' '] for x in URLS])
+    sites = OrderedDict([[x, '-'] for x in URLS])
+    headers = OrderedDict([[x, '-'] for x in URLS])
     data = dict()
     for entry in data_entries:
         date_scraped = entry.timestamp
@@ -217,15 +217,18 @@ def all_malls():
 
             data[name] = rates
 
-    # for vendor in data:
-    #     rates = data[vendor]
-    #     res = []
-    #     for rate in rates:
-    #         rate = rates[rate]
-    #         res.append(rate)
-    #     print vendor, ' - ', res
-    # print '----------'
-    # results = ResultModel.query().order(-ResultModel.timestamp).fetch()
+    # for item in data:
+    #     print item
+    #     print '----------'
+    #     costs = data[item]
+    #     for d in costs:
+    #         cost = get_data_from_html(costs[d])
+    #         if cost == u' ':
+    #             pass
+    #         else:
+    #             print d, cost
+    # print '==================='
+    print headers
     return render_template('all_malls.html', site_names=URLS,
                            date=date,
                            headers=headers, data=data,

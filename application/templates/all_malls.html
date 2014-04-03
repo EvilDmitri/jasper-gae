@@ -40,7 +40,6 @@
                     <tr>
                         <td>{{ vendor }}</td>
                         {% set rates = data[vendor] %}
-
                         {% for rate in rates %}
                             <td class="sorttable_numeric">{{ rates[rate] }}</td>
                         {% endfor %}
