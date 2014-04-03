@@ -388,4 +388,9 @@ def search_result_by_time():
         except ValueError:
             results = ''
 
-    return render_template('list_data.html', site_names=URLS, results=results)
+        data = []
+        for result in results:
+            timestamp = result.timestamp.strftime('%b %d, %Y %I:%M %p')
+            if time in timestamp:
+                data.append(result)
+    return render_template('list_data.html', site_names=URLS, results=data)
