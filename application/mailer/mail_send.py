@@ -4,7 +4,7 @@ from google.appengine.api import mail
 
 class SendStatistics(webapp2.RequestHandler):
     def post(self, data):
-        user_address = 'jasper.gae@gmail.com'
+        user_address = 'jaspermoy1@gmail.com, jasper.gae@gmail.com'
         print data
 
         if not mail.is_email_valid(user_address):

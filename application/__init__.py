@@ -6,8 +6,17 @@ from flask import Flask
 import os
 from flask_debugtoolbar import DebugToolbarExtension
 from werkzeug.debug import DebuggedApplication
+from flask.ext.openid import OpenID
+from openid.extensions import pape
+
+from flask.ext.login import LoginManager
 
 app = Flask('application')
+# login_manager = LoginManager()
+# login_manager.init_app(app)
+
+oid = OpenID(app, safe_roots=[], extension_responses=[pape.Response])
+
 
 if os.getenv('FLASK_CONF') == 'DEV':
     #development settings n
@@ -38,3 +47,5 @@ app.jinja_env.add_extension('jinja2.ext.loopcontrols')
 
 # Pull in URL dispatch routes
 import urls
+
+

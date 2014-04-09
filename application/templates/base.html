@@ -13,6 +13,8 @@
     <style> body { padding-top: 90px; } </style> <!-- Bootstrap -->
     <link href="/static/css/main.css" rel="stylesheet" />
     <link rel="shortcut icon" href="/static/img/favicon.ico" />
+    <link rel=stylesheet type=text/css href="{{ url_for('static',
+      filename='css/style.css') }}">
     {% block style_block %}{# page-specific CSS #}{% endblock %}
     <script src="/static/js/lib/modernizr-{{ modernizer_version }}.min.js"></script>{# Modernizr must be here, above body tag. #}
     {% block head_script %}{# defer-incapable JS block #}{% endblock %}

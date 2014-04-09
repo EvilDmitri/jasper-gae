@@ -1,0 +1,13 @@
+<!doctype html>
+<title>{% block title %}Welcome{% endblock %} CMS</title>
+<link rel=stylesheet type=text/css href="{{ url_for('static',
+  filename='css/style.css') }}">
+<h1></h1>
+<ul class=navigation>
+  <li><a href="{{ url_for('test') }}">Main page</a>
+
+</ul>
+{% for message in get_flashed_messages() %}
+  <p class=message>{{ message }}
+{% endfor %}
+{% block body %}{% endblock %}

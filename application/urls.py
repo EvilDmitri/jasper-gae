@@ -61,7 +61,10 @@ app.add_url_rule('/search', 'search_result_by_time', view_func=views.search_resu
 # Contrived admin-only view merchant
 app.add_url_rule('/admin_only', 'admin_only', view_func=views.admin_only)
 
-
+app.add_url_rule('/login', 'login', view_func=views.login, methods=['GET', 'POST'])
+app.add_url_rule('/create-profile', 'create-profile', view_func=views.create_profile, methods=['GET', 'POST'])
+app.add_url_rule('/profile', 'profile', view_func=views.edit_profile)
+app.add_url_rule('/logout', 'logout', view_func=views.logout)
 
 
 
